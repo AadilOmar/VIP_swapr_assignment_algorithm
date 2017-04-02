@@ -59,9 +59,8 @@ function initGrid(m, n, students){
 	return grid
 }
 
-//creates and returns a list of n students with unique studentIds, and random confidences. (for simplicity, studentname and student id is the same)
+//creates and returns a list of n students with unique studentIds, and random confidences. (for simplicity, studentname and student id is the same) (starts with student 0 ...)
 function createStudents(n){
-	// console.log(n)
 	studentArray = []
 	studentConstant = "student"
 	total_confidence_score = 0.0
@@ -86,28 +85,38 @@ function updateGrid(assignment, student_giving_score){
 	}
 }
 
+//do we want to check to make sure that a students is not grading another students's assignment twice?
+
 // add logic here to pop item with best confidence, add current user confidence,
 // and push the assignment in its correctly sorted place in the grid
-function getNextAssignment(student){
+function getNextAssignment(student, finishRow1First){
 	student_confidence = student.confidence
 	student_id = student.student_id
 
 	assignment_to_pop = null
 	smallest_confidence_difference = avg_student_confidence
 
+	//if we want each assginment to be graded once before we move on to using confidences to find assginments, choose the first asssignment we see that doesn't have a grade
+	if (finishRow1First){
+		for (i = 0; i < grid.array.length; i++){
+			assignment = grid.array[i]
+			if (assignment.grades.length == 0){
+				console.log("sawer")
+				return assignment
+			}			
+		}
+	}
+
+
 	for (i = 0; i < grid.array.length; i++){
-	// for (assignment in grid.array){
 		assignment = grid.array[i]
-		// console.log("assignment: ", assignment)
 
 		total_confidence = 0.0
 		
 		avg_assignment_confidence = 0
 
-		// for (grade in assignment.grades){
 		for (j = 0; j < assignment.grades.length; j++){
 			grade = assignment.grades[j]
-			// console.log("current grade: ", grade)
 			total_confidence += grade.confidence
 		}
 		total_confidence += student.confidence
@@ -120,7 +129,6 @@ function getNextAssignment(student){
 			smallest_confidence_difference = confidence_difference
 			assignment_to_pop = assignment
 		}
-		// console.log("avg conficende", avg_assignment_confidence)
 	}
 	return assignment_to_pop
 }
@@ -138,16 +146,35 @@ console.log("avg student confidence: ",avg_student_confidence)
 
 global.grid = initGrid(m, n, students)
 
+//if this number is n * m, we should fill up the entire grid
+numStudentsToSimulate = 30
 
-numStudentsToSimulate = 4
+//toggle this to see difference when we try to fill up the first row first vs we dont
+finishRow1FirstHeuristic = true
+
 
 //simulates students grading assignments
-for(s = 1; s < numStudentsToSimulate+1; s++){
-	random_student = students[s]
-	console.log("Student "+ s+": ",random_student)
-	assignment = getNextAssignment(random_student)
+for(s = 0; s < numStudentsToSimulate; s++){
+
+	//gets a random number from 1 to numStudentsToSimulate (to index into the list of students) 
+	index = Math.floor(Math.random()*(n));
+	random_student = students[index]
+	
+	console.log("Student "+ index +": ",random_student)
+	assignment = getNextAssignment(random_student, finishRow1FirstHeuristic)
 	updateGrid(assignment, random_student)
 	grid.printNicely()
+	console.log("---------------------------")
 }
 
 
+/*
+ * NOTES
+ *
+ * when we don't actively try to fill in the first row first, what happens is that the rows start filling up from the bottom: 
+ 	the last assignment fills up completely, then the second last, then the third last ...
+ 
+ * When we do actively try to fill in the first rows of the grades (make sure that each assignment has atleast one grade before calculating confidences), 
+ 	it seems that the assignments that are chosen are more spread out 
+ *
+ */ 
