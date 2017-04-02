@@ -9,7 +9,25 @@ function Grid(m, n, students) {
 	for(i = 0; i < n; i++) {
 		currentStudent = students[i]
 		this.array[i] = new Assignment(assignmentName, m, currentStudent.student_id)
-		// console.log(this.array[i])
+	}
+
+	//prints the grid nicely - to see where the grades are being inputted
+	this.printNicely = function(){
+		for (i = 0; i < n; i++){
+			gradeExists = false
+			assignment = this.array[i]
+			gradeRepresentation = "Index "+i+":: " 
+			for (j = 0; j < m; j++){
+				if (assignment.grades[j] != undefined){
+					gradeRepresentation += "[" + assignment.grades[j].student_id + "- confidence: " + assignment.grades[j].confidence + "], "					
+					gradeExists = true
+				}
+			}
+			if (!gradeExists){
+				gradeRepresentation += "[]"
+			}
+			console.log(gradeRepresentation)						
+		}
 	}
 }
 
@@ -62,8 +80,8 @@ function updateGrid(assignment, student_giving_score){
 		if (grid.array[i] == assignment){
 			score = parseFloat(Math.random(40, 100).toFixed(2))
 			newGrade = new Grade(student_giving_score.student_id, score ,student_giving_score.confidence)
-			console.log("updating grid: found the assignment that needs to be updated", newGrade)						
-			grid.array[i].grades.push()
+			// console.log("updating grid: found the assignment that needs to be updated", newGrade)						
+			grid.array[i].grades.push(newGrade)
 		}
 	}
 }
@@ -96,6 +114,7 @@ function getNextAssignment(student){
 		avg_assignment_confidence = total_confidence / (assignment.grades.length + 1)
 
 		confidence_difference = (Math.abs(avg_assignment_confidence - avg_student_confidence))
+		
 		if (confidence_difference <= smallest_confidence_difference && assignment.grades.length < m && assignment.student_id != student.student_id){
 			// console.log("found smaller difference", confidence_difference, smallest_confidence_difference)
 			smallest_confidence_difference = confidence_difference
@@ -109,28 +128,26 @@ function getNextAssignment(student){
 
 
 global.m = 3
-n = 25
+global.n = 10
 
 arr = createStudents(n)
 students = createStudents(n)[0]
 global.avg_student_confidence = createStudents(n)[1]
 
-// console.log(avg_student_confidence)
+console.log("avg student confidence: ",avg_student_confidence)
 
 global.grid = initGrid(m, n, students)
 
-random_student1 = students[3]
-console.log("Student 1:",random_student1)
-assignment = getNextAssignment(random_student1)
-// console.log(assignment)
-updateGrid(assignment, random_student1)
 
+numStudentsToSimulate = 4
 
-random_student2 = students[5]
-console.log("Student 2:",random_student2)
-assignment = getNextAssignment(random_student2)
-// console.log(assignment)
-updateGrid(assignment, random_student2)
-
+//simulates students grading assignments
+for(s = 1; s < numStudentsToSimulate+1; s++){
+	random_student = students[s]
+	console.log("Student "+ s+": ",random_student)
+	assignment = getNextAssignment(random_student)
+	updateGrid(assignment, random_student)
+	grid.printNicely()
+}
 
 
