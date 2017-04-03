@@ -90,6 +90,21 @@ function updateGrid(assignment, student_giving_score){
 // add logic here to pop item with best confidence, add current user confidence,
 // and push the assignment in its correctly sorted place in the grid
 function getNextAssignment(student, finishRow1First){
+	numTotalGrades = 0;
+
+	for (t = 0; t < grid.array.length; t++) {
+		assignment = grid.array[t]
+		for (v = 0; v < assignment.grades; v++) {
+			if (assignment.grades[v].student_id === student.student_id) {
+				numTotalGrades++
+			}
+		}
+	}
+
+	if (numTotalGrades === m) {
+		return null
+	}
+
 	student_confidence = student.confidence
 	student_id = student.student_id
 
@@ -100,7 +115,7 @@ function getNextAssignment(student, finishRow1First){
 	if (finishRow1First){
 		for (i = 0; i < grid.array.length; i++){
 			assignment = grid.array[i]
-			if (assignment.grades.length == 0){
+			if (assignment.grades.length === 0){
 				console.log("sawer")
 				return assignment
 			}			
@@ -123,8 +138,17 @@ function getNextAssignment(student, finishRow1First){
 		avg_assignment_confidence = total_confidence / (assignment.grades.length + 1)
 
 		confidence_difference = (Math.abs(avg_assignment_confidence - avg_student_confidence))
-		
-		if (confidence_difference <= smallest_confidence_difference && assignment.grades.length < m && assignment.student_id != student.student_id){
+		hasGraded = false;
+        for (k = 0; k < assignment.grades.length; k++) {
+            if (assignment.grades[k].student_id === student.student_id) {
+				hasGraded = true
+            }
+        }
+
+		if (confidence_difference <= smallest_confidence_difference
+			&& assignment.grades.length < m
+			&& assignment.student_id !== student.student_id
+			&& !hasGraded){
 			// console.log("found smaller difference", confidence_difference, smallest_confidence_difference)
 			smallest_confidence_difference = confidence_difference
 			assignment_to_pop = assignment
@@ -147,25 +171,29 @@ console.log("avg student confidence: ",avg_student_confidence)
 global.grid = initGrid(m, n, students)
 
 //if this number is n * m, we should fill up the entire grid
-numStudentsToSimulate = 30
+numStudentsToSimulate = 50
 
 //toggle this to see difference when we try to fill up the first row first vs we dont
 finishRow1FirstHeuristic = true
 
 
 //simulates students grading assignments
-for(s = 0; s < numStudentsToSimulate; s++){
+for (s = 0; s < numStudentsToSimulate; s++) {
 
-	//gets a random number from 1 to numStudentsToSimulate (to index into the list of students) 
-	index = Math.floor(Math.random()*(n));
+	//gets a random number from 1 to numStudentsToSimulate (to index into the list of students)
+	index = Math.floor(Math.random() * (n));
 	random_student = students[index]
-	
-	console.log("Student "+ index +": ",random_student)
+
+	console.log("Student " + index + ": ", random_student)
 	assignment = getNextAssignment(random_student, finishRow1FirstHeuristic)
+	if (assignment === null) {
+		console.log("Assignment returned was null")
+	}
 	updateGrid(assignment, random_student)
 	grid.printNicely()
 	console.log("---------------------------")
 }
+
 
 
 /*
