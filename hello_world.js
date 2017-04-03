@@ -90,18 +90,18 @@ function updateGrid(assignment, student_giving_score){
 // add logic here to pop item with best confidence, add current user confidence,
 // and push the assignment in its correctly sorted place in the grid
 function getNextAssignment(student, finishRow1First){
-	numTotalGrades = 0;
-
+	
+	//check how many assignments the current student has graded - if he has graded m already, return null
+	numAssignmentsGraded = 0;
 	for (t = 0; t < grid.array.length; t++) {
 		assignment = grid.array[t]
-		for (v = 0; v < assignment.grades; v++) {
-			if (assignment.grades[v].student_id === student.student_id) {
-				numTotalGrades++
+		for (v = 0; v < assignment.grades.length; v++) {
+			if (assignment.grades[v].student_id == student.student_id) {
+				numAssignmentsGraded++
 			}
 		}
 	}
-
-	if (numTotalGrades === m) {
+	if (numAssignmentsGraded === m) {
 		return null
 	}
 
@@ -170,17 +170,17 @@ console.log("avg student confidence: ",avg_student_confidence)
 
 global.grid = initGrid(m, n, students)
 
-//if this number is n * m, we should fill up the entire grid
-numStudentsToSimulate = 50
+//number of total gradings by students we want to simulate
+numGradingsToSimulate = 30
 
 //toggle this to see difference when we try to fill up the first row first vs we dont
 finishRow1FirstHeuristic = true
 
 
 //simulates students grading assignments
-for (s = 0; s < numStudentsToSimulate; s++) {
+for (s = 0; s < numGradingsToSimulate; s++) {
 
-	//gets a random number from 1 to numStudentsToSimulate (to index into the list of students)
+	//gets a random number from 1 to numGradingsToSimulate (to index into the list of students)
 	index = Math.floor(Math.random() * (n));
 	random_student = students[index]
 
