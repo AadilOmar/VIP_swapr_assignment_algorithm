@@ -227,14 +227,14 @@ function calculateAverage(){
 
 global.m = 3
 global.n = 10
-num_simulations = 100
+num_simulations = 1000
 
 //do we want to output the differences of average_video_confidence - average_student_confidence
 //or simply output the average_video_confidence
 output_average_difference = false
 
 //do we want random assignment, or calculated assignment?
-random_assignment = false
+random_assignment = true
 
 //list of average_conf per video across the number of simulations
 total_average_confidence_arr = []
@@ -295,6 +295,12 @@ if (output_average_difference){
 }
 else{
 	console.log("AVERAGE STUDENT CONFIDENCE PER VIDEO")
+}
+if (random_assignment){
+	console.log("RANDOM ASSIGNMENT")
+}
+else{
+	console.log("calculateAverage")
 }
 for (i = 0; i < total_average_confidence_arr.length; i++){
 	console.log(total_average_confidence_arr[i])
