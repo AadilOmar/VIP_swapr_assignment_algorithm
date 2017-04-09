@@ -277,7 +277,6 @@ for (times = 0; times < num_simulations; times++){
 
 	// console.log(grid.isComplete())
 
-
 	averages = calculateAverage()
 	// console.log(averages)
 
